@@ -59,6 +59,7 @@ def single_test(i, args):
 
 def test(args):
     print(f"testing {args.n} cases...")
+    start = time.time()
     ray.init(num_cpus=10)
     # テスト結果を格納するディレクトリを作る
     os.makedirs(f"../{args.contest}/tools/out", exist_ok=True)
@@ -75,3 +76,4 @@ def test(args):
     result_df.to_csv(f"../{args.contest}/result/{current_time}.csv", index=False)
 
     print("test finished")
+    print(f"elapsed: {time.time() - start}")

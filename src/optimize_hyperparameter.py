@@ -69,8 +69,12 @@ def objective_wrapper(args, hyperparameters):
 
 def run_optuna(args):
     print("optimizing hyperparameters...")
+    start = time.time()
     ray.init(num_cpus=10)
     # ハイパーパラメータの探索空間定義を取得
+    if not os.path.exists(f"../{args.contest}/hyperparameter.yaml"):
+        print("hyperparameter.yaml does not exists")
+        exit(1)
     with open(f"../{args.contest}/hyperparameter.yaml", "r") as f:
         hyperparameter_yaml = yaml.safe_load(f)
 
@@ -83,7 +87,6 @@ def run_optuna(args):
     # Cargo.tomlにRustのコマンドライン引数解析クレートであるclapが入っているか確認する
     with open(f"../{args.contest}/Cargo.toml", mode="rb") as f:
         toml = tomllib.load(f)
-
     if not "clap" in toml["dependencies"]:
         os.chdir(f"../{args.contest}")
         os.system("cargo add clap --features derive")
@@ -104,3 +107,4 @@ def run_optuna(args):
         json.dump(study.best_params, f, indent=4)
 
     print("optimization finished")
+    print(f"elapsed: {time.time() - start}")
