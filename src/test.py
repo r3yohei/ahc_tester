@@ -22,7 +22,10 @@ def single_test(i, args):
             tester = "../../../target/release/tester"
         else:
             tester = ""
-        testee = f"../../../target/release/{args.contest}-a"
+        if args.platform == "atcoder":
+            testee = f"../../../target/release/{args.contest}-a"
+        elif args.platform == "yukicoder":
+            testee = f"../../../target/release/contest{args.contest}-a"
         proc = subprocess.Popen(
             f"{tester} {testee} < ../{args.contest}/tools/in/{i:04}.txt > ../{args.contest}/tools/out/{i:04}.txt",
             shell=True,
