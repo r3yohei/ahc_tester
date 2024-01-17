@@ -3,7 +3,7 @@ import argparse
 
 import ray
 
-from src.test import test, single_test
+from src.test import parallel_test, single_test
 from src.optimize_hyperparameter import run_optuna
 
 
@@ -39,7 +39,7 @@ def main():
         # 配布ローカルテスターをビルド
         visualizer = "../../../target/release/vis"
         # 存在しないか，コンテストディレクトリより古い(=過去のテスター)ならビルドする
-        if not os.path.exists(visualizer) or (os.path.exists(visualizer) and os.stat(visualizer).st_mtime < os.stat(f"../{args.contest}").st_mtime):
+        if not os.path.exists(visualizer) or (os.path.exists(visualizer) and os.stat(visualizer).st_mtime >= os.stat(f"../{args.contest}").st_mtime):
             print("building local tester...")
             os.chdir(f"../{args.contest}/tools")
             os.system("cargo build -r")
@@ -53,11 +53,10 @@ def main():
         run_optuna(args)
     elif args.n is not None:
         # [0,n)のテストケースを実行する
-        test(args)
+        parallel_test(args)
     elif args.single is not None:
         # 指定のテストケースを1つ実行する
-        proc = single_test.remote(args.single, args)
-        ray.get(proc)
+        single_test(args.single, args)
 
     # テストケースを増やす
     if args.gen is not None:
