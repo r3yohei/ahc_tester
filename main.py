@@ -29,6 +29,12 @@ def main():
     if not os.path.exists(f"../{args.contest}"):
         print(f"contest directory {args.contest} does not exists")
         exit(1)
+    if not os.path.exists(f"../{args.contest}/tools"):
+        print(f"{args.contest} local tester does not exists. please download from atcoder.")
+        exit(1)
+    if not os.path.exists(f"../{args.contest}/tools/out"):
+        print(f"making tester output directory as {args.contest}/tools/out.")
+        os.makedirs(f"../{args.contest}/tools/out")
     
     if args.build:
         # 自前のソースコードをビルド
@@ -39,7 +45,7 @@ def main():
         # 配布ローカルテスターをビルド
         visualizer = "../../../target/release/vis"
         # 存在しないか，コンテストディレクトリより古い(=過去のテスター)ならビルドする
-        if not os.path.exists(visualizer) or (os.path.exists(visualizer) and os.stat(visualizer).st_mtime >= os.stat(f"../{args.contest}").st_mtime):
+        if not os.path.exists(visualizer) or (os.path.exists(visualizer) and os.stat(visualizer).st_mtime <= os.stat(f"../{args.contest}").st_mtime):
             print("building local tester...")
             os.chdir(f"../{args.contest}/tools")
             os.system("cargo build -r")
