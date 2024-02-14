@@ -51,8 +51,6 @@ def main():
             os.system("cargo build -r")
             os.chdir("..")
 
-        print("finished")
-
     os.chdir(f"../{args.contest}")
     if args.optuna and args.n is not None:
         # プログラム内のハイパーパラメータをoptunaで最適化する
@@ -66,6 +64,7 @@ def main():
 
     # テストケースを増やす
     if args.gen is not None:
+        print(f"generating {args.gen} test cases...")
         with open(f"../{args.contest}/tools/seeds.txt", "w") as f:
             for i in range(args.gen):
                 f.write("{}\n".format(i))
