@@ -2,8 +2,8 @@ import os
 import subprocess
 import json
 import time
+import math
 import yaml
-import tomllib
 import statistics
 
 import ray
@@ -36,7 +36,12 @@ def single_test(i, args, hyperparameters):
         if "score" in c or "Score" in c:
             score = c.split(" ")[-1]
 
-    return int(score)
+    if args.optuna_score_type == "a":
+        # 絶対スコア
+        return int(score)
+    else:
+        # 相対スコア
+        return math.log10(1 + int(score))
 
 def objective_wrapper(args, hyperparameters):
 
@@ -83,13 +88,6 @@ def run_optuna(args):
     if not os.path.exists(testee):
         print("binary named optuna does not exists")
         exit(1)
-
-    # Cargo.tomlにRustのコマンドライン引数解析クレートであるclapが入っているか確認する
-    with open(f"../{args.contest}/Cargo.toml", mode="rb") as f:
-        toml = tomllib.load(f)
-    if not "clap" in toml["dependencies"]:
-        os.chdir(f"../{args.contest}")
-        os.system("cargo add clap --features derive")
 
     # スコアの最大化か最小化かに注意
     study = optuna.create_study(

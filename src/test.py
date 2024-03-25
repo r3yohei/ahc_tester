@@ -1,6 +1,7 @@
 import os
 import subprocess
 import time
+import math
 
 import pandas as pd
 import ray
@@ -48,8 +49,8 @@ def parallel_test_func(i, args):
 
     if score is not None:
         # seriesを作って返す
-        data = [i, score]
-        index = ["case", "score"]
+        data = [i, score, math.log10(1 + score)]
+        index = ["case", "score", "log_score"]
         if args.parameter is not None:
             for p in args.parameter:
                 data.append(param_dict[p])

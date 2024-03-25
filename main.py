@@ -1,5 +1,6 @@
 import os
 import argparse
+import tomllib
 
 import ray
 
@@ -21,6 +22,7 @@ def main():
     parser.add_argument("-o", "--optuna", help="optimize hyperparameters with optuna", action="store_true")
     parser.add_argument("-on", "--optuna-n-trials", help="optuna n_trials", type=int, default=100)
     parser.add_argument("-od", "--optuna-direction", help="optimizing direction", type=str, default="maximize")
+    parser.add_argument("-ost", "--optuna_score_type", help="optimize with absolute or relative score", type=str, choices=["a", "r"], default="r")
     parser.add_argument("-g", "--gen", help="num of generating testcases", type=int, default=None)
     args = parser.parse_args()
 
@@ -37,6 +39,15 @@ def main():
         os.makedirs(f"../{args.contest}/tools/out")
     
     if args.build:
+        # optunaを回す前にCargo.tomlにRustのコマンドライン引数解析クレートであるclapが入っているか確認する
+        if args.optuna:
+            with open(f"../{args.contest}/Cargo.toml", mode="rb") as f:
+                toml = tomllib.load(f)
+            if not "clap" in toml["dependencies"]:
+                os.chdir(f"../{args.contest}")
+                # v1.70.0用を指定することと，--features deriveでderive形式を使えるものを指定することに注意
+                os.system("cargo add clap@=4.4.18 --features derive")
+
         # 自前のソースコードをビルド
         print("building source code...")
         os.chdir(f"../{args.contest}")
