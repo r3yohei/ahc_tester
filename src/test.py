@@ -49,7 +49,7 @@ def parallel_test_func(i, args):
 
     if score is not None:
         # seriesを作って返す
-        data = [i, score, math.log10(1 + score)]
+        data = [i, score, math.log10(1 + int(score))]
         index = ["case", "score", "log_score"]
         if args.parameter is not None:
             for p in args.parameter:
