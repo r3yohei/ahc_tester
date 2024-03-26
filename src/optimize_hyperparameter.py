@@ -36,12 +36,16 @@ def single_test(i, args, hyperparameters):
         if "score" in c or "Score" in c:
             score = c.split(" ")[-1]
 
-    if args.optuna_score_type == "a":
-        # 絶対スコア
-        return int(score)
+    if score is not None:
+        if args.optuna_score_type == "a":
+            # 絶対スコア
+            return int(score)
+        else:
+            # 相対スコア
+            return math.log10(1 + int(score))
     else:
-        # 相対スコア
-        return math.log10(1 + int(score))
+        print("cannot get score")
+        exit(1)    
 
 def objective_wrapper(args, hyperparameters):
 
