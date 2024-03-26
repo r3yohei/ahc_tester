@@ -32,6 +32,7 @@ def single_test(i, args, hyperparameters):
     )
 
     content = proc.stderr.read()
+    score = None
     for c in content.split("\n"):
         if "score" in c or "Score" in c:
             score = c.split(" ")[-1]
@@ -44,8 +45,13 @@ def single_test(i, args, hyperparameters):
             # 相対スコア
             return math.log10(1 + int(score))
     else:
-        print("cannot get score")
-        exit(1)    
+        # scoreが取れないとき
+        if args.optuna_direction == "maximize":
+            # 方向がmaximizeなら，0点とする
+            return 0
+        else:
+            # 方向がminimizeなら，INF点とする
+            return 1e10
 
 def objective_wrapper(args, hyperparameters):
 

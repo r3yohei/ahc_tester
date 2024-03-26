@@ -38,6 +38,7 @@ def parallel_test_func(i, args):
     param_dict = dict()
     content = proc.stderr.read()
     print(content)
+    score = None
     for c in content.split("\n"):
         if "score" in c or "Score" in c:
             score = c.split(" ")[-1]
