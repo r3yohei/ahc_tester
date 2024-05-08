@@ -13,7 +13,7 @@ def parallel_test_func(i, args):
     if args.visualizer:
         visualizer = "../../../target/release/vis"
         proc = subprocess.Popen(
-            f"{visualizer} < ../{args.contest}/tools/in/{i:04d}.txt > ../{args.contest}/tools/out/{i:04d}.txt",
+            f"{visualizer} < ../{args.contest}/tools/in{args.directory}/{i:04d}.txt > ../{args.contest}/tools/out{args.directory}/{i:04d}.txt",
             shell=True,
             stderr=subprocess.PIPE,
             text=True
@@ -24,11 +24,11 @@ def parallel_test_func(i, args):
         else:
             tester = ""
         if args.platform == "atcoder":
-            testee = f"../../../target/release/{args.contest}-a"
+            testee = f"../../../target/release/{args.contest}-{args.binary_suffix}"
         elif args.platform == "yukicoder":
-            testee = f"../../../target/release/contest{args.contest}-a"
+            testee = f"../../../target/release/contest{args.contest}-{args.binary_suffix}"
         proc = subprocess.Popen(
-            f"{tester} {testee} < ../{args.contest}/tools/in/{i:04}.txt > ../{args.contest}/tools/out/{i:04}.txt",
+            f"{tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt > ../{args.contest}/tools/out{args.directory}/{i:04}.txt",
             shell=True,
             stderr=subprocess.PIPE,
             text=True
@@ -59,7 +59,7 @@ def parallel_test_func(i, args):
         
         return pd.Series(data=data, index=index)
     else:
-        print("cannot get score")
+        print(f"cannot get score in case {i:04}")
         exit(1)
 
 def parallel_test(args):
@@ -67,8 +67,8 @@ def parallel_test(args):
     start = time.time()
     ray.init(num_cpus=10)
     # テスト結果を格納するディレクトリを作る
-    os.makedirs(f"../{args.contest}/tools/out", exist_ok=True)
-    os.makedirs(f"../{args.contest}/result", exist_ok=True)
+    os.makedirs(f"../{args.contest}/tools/out{args.directory}", exist_ok=True)
+    os.makedirs(f"../{args.contest}/result{args.directory}", exist_ok=True)
 
     # テストの並列実行
     proc_list = []
@@ -78,7 +78,7 @@ def parallel_test(args):
     series_list = ray.get(proc_list)
     result_df = pd.DataFrame(series_list)
     current_time = time.strftime("%Y_%m_%d-%H_%M_%S", time.localtime())
-    result_df.to_csv(f"../{args.contest}/result/{current_time}.csv", index=False)
+    result_df.to_csv(f"../{args.contest}/result{args.directory}/{current_time}.csv", index=False)
 
     print("test finished")
     print(f"elapsed: {time.time() - start}")
@@ -89,7 +89,7 @@ def single_test(i, args):
     if args.visualizer:
         visualizer = "../../../target/release/vis"
         proc = subprocess.Popen(
-            f"{visualizer} < ../{args.contest}/tools/in/{i:04d}.txt > ../{args.contest}/tools/out/{i:04d}.txt",
+            f"{visualizer} < ../{args.contest}/tools/in{args.directory}/{i:04d}.txt > ../{args.contest}/tools/out{args.directory}/{i:04d}.txt",
             shell=True,
             stderr=subprocess.PIPE,
             text=True
@@ -100,11 +100,11 @@ def single_test(i, args):
         else:
             tester = ""
         if args.platform == "atcoder":
-            testee = f"../../../target/release/{args.contest}-a"
+            testee = f"../../../target/release/{args.contest}-{args.binary_suffix}"
         elif args.platform == "yukicoder":
-            testee = f"../../../target/release/contest{args.contest}-a"
+            testee = f"../../../target/release/contest{args.contest}-{args.binary_suffix}"
         proc = subprocess.Popen(
-            f"{tester} {testee} < ../{args.contest}/tools/in/{i:04}.txt > ../{args.contest}/tools/out/{i:04}.txt",
+            f"{tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt > ../{args.contest}/tools/out{args.directory}/{i:04}.txt",
             shell=True,
             stderr=subprocess.PIPE,
             text=True

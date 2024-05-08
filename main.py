@@ -17,8 +17,10 @@ def main():
     parser.add_argument("-v", "--visualizer", help="use visualizer for calculating score", action="store_true")
     parser.add_argument("-b", "--build", help="build source code", action="store_true")
     parser.add_argument("-s", "--single", help="test a given id case", type=int, default=None)
+    parser.add_argument("-bp", "--binary-suffix", help="binary suffix. default is 'a' in atcoder", type=str, default="a")
     parser.add_argument("-n", help="num of test cases", type=int, default=None)
     parser.add_argument("-pr", "--parameter", help="parameter names given by a contest", nargs="+", type=str, default=None)
+    parser.add_argument("-d", "--directory", help="name of testcase directory", type=str, default="")
     parser.add_argument("-o", "--optuna", help="optimize hyperparameters with optuna", action="store_true")
     parser.add_argument("-on", "--optuna-n-trials", help="optuna n_trials", type=int, default=100)
     parser.add_argument("-od", "--optuna-direction", help="optimizing direction", type=str, default="maximize")
@@ -34,9 +36,9 @@ def main():
     if not os.path.exists(f"../{args.contest}/tools"):
         print(f"{args.contest} local tester does not exists. please download from atcoder.")
         exit(1)
-    if not os.path.exists(f"../{args.contest}/tools/out"):
-        print(f"making tester output directory as {args.contest}/tools/out.")
-        os.makedirs(f"../{args.contest}/tools/out")
+    if not os.path.exists(f"../{args.contest}/tools/out{args.directory}"):
+        print(f"making tester output directory as {args.contest}/tools/out{args.directory}.")
+        os.makedirs(f"../{args.contest}/tools/out{args.directory}")
     
     if args.build:
         # optunaを回す前にCargo.tomlにRustのコマンドライン引数解析クレートであるclapが入っているか確認する
@@ -89,7 +91,11 @@ def main():
             os.chdir("..")
         
         os.chdir(f"../{args.contest}/tools")
-        os.system(f"../{generator} ./seeds.txt")
+        if len(args.directory) > 0:
+            # 複数問のテストケースへの対応
+            os.system(f"../{generator} ./seeds.txt --problem {args.directory} --dir=in{args.directory}")
+        else:
+            os.system(f"../{generator} ./seeds.txt")
         os.chdir("..")
 
 

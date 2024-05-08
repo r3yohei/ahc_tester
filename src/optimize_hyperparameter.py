@@ -20,7 +20,7 @@ def single_test(i, args, hyperparameters):
     testee = f"../../../target/release/optuna"
 
     # clapクレートを使う想定のため，コマンドライン引数が続くことを示す--を記載
-    command = f"{tester} {testee} < ../{args.contest}/tools/in/{i:04}.txt > ../{args.contest}/tools/out/{i:04}.txt --"
+    command = f"{tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt --"
     # ハイパーパラメータを文字列に結合し，subprocessにrustを実行させる
     for hp in hyperparameters:
         command += f" {hp}"
@@ -87,10 +87,10 @@ def run_optuna(args):
     start = time.time()
     ray.init(num_cpus=10)
     # ハイパーパラメータの探索空間定義を取得
-    if not os.path.exists(f"../{args.contest}/hyperparameter.yaml"):
-        print("hyperparameter.yaml does not exists")
+    if not os.path.exists(f"../{args.contest}/hyperparameter{args.directory}.yaml"):
+        print(f"hyperparameter{args.directory}.yaml does not exists")
         exit(1)
-    with open(f"../{args.contest}/hyperparameter.yaml", "r") as f:
+    with open(f"../{args.contest}/hyperparameter{args.directory}.yaml", "r") as f:
         hyperparameter_yaml = yaml.safe_load(f)
 
     # ahcXXX-aではなく，optunaという名前のバイナリを別で用意すること
@@ -101,17 +101,17 @@ def run_optuna(args):
 
     # スコアの最大化か最小化かに注意
     study = optuna.create_study(
-        study_name=args.contest,
+        study_name=f"{args.contest}{args.directory}",
         direction=args.optuna_direction,
-        storage=f"sqlite:///{args.contest}.db",
+        storage=f"sqlite:///{args.contest}{args.directory}.db",
         load_if_exists=True,
     )
     study.optimize(objective_wrapper(args, hyperparameter_yaml["hyperparameter"]), n_trials=args.optuna_n_trials)
     
     # 最適化結果の保存
-    os.makedirs(f"../{args.contest}/optimized_hyperparameter", exist_ok=True)
+    os.makedirs(f"../{args.contest}/optimized_hyperparameter{args.directory}", exist_ok=True)
     current_time = time.strftime("%Y_%m_%d-%H_%M_%S", time.localtime())
-    with open(f"../{args.contest}/optimized_hyperparameter/{current_time}.json", "w") as f:
+    with open(f"../{args.contest}/optimized_hyperparameter{args.directory}/{current_time}.json", "w") as f:
         json.dump(study.best_params, f, indent=4)
 
     print("optimization finished")
