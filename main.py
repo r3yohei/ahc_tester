@@ -17,7 +17,7 @@ def main():
     parser.add_argument("-v", "--visualizer", help="use visualizer for calculating score", action="store_true")
     parser.add_argument("-b", "--build", help="build source code", action="store_true")
     parser.add_argument("-s", "--single", help="test a given id case", type=int, default=None)
-    parser.add_argument("-bp", "--binary-suffix", help="binary suffix. default is 'a' in atcoder", type=str, default="a")
+    parser.add_argument("-bs", "--binary-suffix", help="binary suffix. default is 'a' in atcoder", type=str, default="a")
     parser.add_argument("-n", help="num of test cases", type=int, default=None)
     parser.add_argument("-pr", "--parameter", help="parameter names given by a contest", nargs="+", type=str, default=None)
     parser.add_argument("-d", "--directory", help="name of testcase directory", type=str, default="")
