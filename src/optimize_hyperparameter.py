@@ -20,7 +20,7 @@ def single_test(i, args, hyperparameters):
     testee = f"../../../target/release/optuna"
 
     # clapクレートを使う想定のため，コマンドライン引数が続くことを示す--を記載
-    command = f"{tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt --"
+    command = f"{tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt > /dev/null --"
     # ハイパーパラメータを文字列に結合し，subprocessにrustを実行させる
     for hp in hyperparameters:
         command += f" {hp}"
