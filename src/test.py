@@ -94,7 +94,7 @@ def single_test(i, args):
     if args.visualizer:
         visualizer = "../../../target/release/vis"
         proc = subprocess.Popen(
-            f"{visualizer} < ../{args.contest}/tools/in{args.directory}/{i:04d}.txt > ../{args.contest}/tools/out{args.directory}/{i:04d}.txt",
+            f"{visualizer} ../{args.contest}/tools/in{args.directory}/{i:04d}.txt ../{args.contest}/tools/out{args.directory}/{i:04d}.txt",
             shell=True,
             stderr=subprocess.PIPE,
             text=True
