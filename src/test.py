@@ -13,7 +13,7 @@ def parallel_test_func(i, args):
     if args.visualizer:
         visualizer = "../../../target/release/vis"
         proc = subprocess.Popen(
-            f"{visualizer} < ../{args.contest}/tools/in{args.directory}/{i:04d}.txt > ../{args.contest}/tools/out{args.directory}/{i:04d}.txt",
+            f"{visualizer} ../{args.contest}/tools/in{args.directory}/{i:04d}.txt ../{args.contest}/tools/out{args.directory}/{i:04d}.txt",
             shell=True,
             stderr=subprocess.PIPE,
             text=True
@@ -28,7 +28,7 @@ def parallel_test_func(i, args):
         elif args.platform == "yukicoder":
             testee = f"../../../target/release/contest{args.contest}-{args.binary_suffix}"
         proc = subprocess.Popen(
-            f"{tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt > ../{args.contest}/tools/out{args.directory}/{i:04}.txt",
+            f"exec {tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt > ../{args.contest}/tools/out{args.directory}/{i:04}.txt",
             shell=True,
             stderr=subprocess.PIPE,
             text=True
@@ -40,6 +40,9 @@ def parallel_test_func(i, args):
     print(content)
     score = None
     for c in content.split("\n"):
+        if "panicked" in c:
+            print(f"error occurs in case {i:04}")
+            proc.kill()
         if "score" in c or "Score" in c:
             score = c.split(" ")[-1]
         if args.parameter is not None:
@@ -60,7 +63,7 @@ def parallel_test_func(i, args):
         return pd.Series(data=data, index=index)
     else:
         print(f"cannot get score in case {i:04}")
-        exit(1)
+        return None
 
 def parallel_test(args):
     print(f"testing {args.n} cases...")
@@ -73,7 +76,9 @@ def parallel_test(args):
     # テストの並列実行
     proc_list = []
     for i in range(args.n):
-        proc_list.append(parallel_test_func.remote(i, args))
+        tmp_series = parallel_test_func.remote(i, args)
+        if tmp_series is not None:
+            proc_list.append(tmp_series)
 
     series_list = ray.get(proc_list)
     result_df = pd.DataFrame(series_list)
