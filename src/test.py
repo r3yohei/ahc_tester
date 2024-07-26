@@ -53,7 +53,7 @@ def parallel_test_func(i, args):
 
     if score is not None:
         # seriesを作って返す
-        data = [i, score, math.log10(1 + int(score))]
+        data = [i, int(score), math.log10(1 + int(score))]
         index = ["case", "score", "log_score"]
         if args.parameter is not None:
             for p in args.parameter:
@@ -86,6 +86,8 @@ def parallel_test(args):
     result_df.to_csv(f"../{args.contest}/result{args.directory}/{current_time}.csv", index=False)
 
     print("test finished")
+    print(f"average score: {result_df['score'].mean()}")
+    print(f"average log score: {result_df['log_score'].mean()}")
     print(f"elapsed: {time.time() - start}")
 
 def single_test(i, args):
