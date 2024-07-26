@@ -16,6 +16,7 @@ def main():
     parser.add_argument("-i", "--interactive", help="interactive or not", action="store_true")
     parser.add_argument("-v", "--visualizer", help="use visualizer for calculating score", action="store_true")
     parser.add_argument("-b", "--build", help="build source code", action="store_true")
+    parser.add_argument("-fb", "--force-build", help="forcely build tester code", action="store_true")
     parser.add_argument("-s", "--single", help="test a given id case", type=int, default=None)
     parser.add_argument("-bs", "--binary-suffix", help="binary suffix. default is 'a' in atcoder", type=str, default="a")
     parser.add_argument("-n", help="num of test cases", type=int, default=None)
@@ -50,19 +51,20 @@ def main():
                 # v1.70.0用を指定することと，--features deriveでderive形式を使えるものを指定することに注意
                 os.system("cargo add clap@=4.4.18 --features derive")
 
+        # 配布ローカルテスターをビルド
+        visualizer = "../../../target/release/vis"
+        # 強制ビルドか，存在しないか，コンテストディレクトリより古い(=過去のテスター)ならビルドする
+        if args.force_build or not os.path.exists(visualizer) or (os.path.exists(visualizer) and os.stat(visualizer).st_mtime < os.stat(f"../{args.contest}").st_mtime):
+            print("building local tester...")
+            os.chdir(f"../{args.contest}/tools")
+            os.system("cargo clean -r")
+            os.system("cargo build -r")
+            os.chdir("..")
+
         # 自前のソースコードをビルド
         print("building source code...")
         os.chdir(f"../{args.contest}")
         os.system("cargo build -r")
-
-        # 配布ローカルテスターをビルド
-        visualizer = "../../../target/release/vis"
-        # 存在しないか，コンテストディレクトリより古い(=過去のテスター)ならビルドする
-        if not os.path.exists(visualizer) or (os.path.exists(visualizer) and os.stat(visualizer).st_mtime <= os.stat(f"../{args.contest}").st_mtime):
-            print("building local tester...")
-            os.chdir(f"../{args.contest}/tools")
-            os.system("cargo build -r")
-            os.chdir("..")
 
     os.chdir(f"../{args.contest}")
     if args.optuna and args.n is not None:
@@ -83,10 +85,11 @@ def main():
                 f.write("{}\n".format(i))
 
         generator = "../../../target/release/gen"
-        # 存在しないか，コンテストディレクトリより古い(=過去のテスター)ならビルドする
-        if not os.path.exists(generator) or (os.path.exists(generator) and os.stat(generator).st_mtime < os.stat(f"../{args.contest}").st_mtime):
+        # 強制ビルドか，存在しないか，コンテストディレクトリより古い(=過去のテスター)ならビルドする
+        if args.force_build or not os.path.exists(generator) or (os.path.exists(generator) and os.stat(generator).st_mtime < os.stat(f"../{args.contest}").st_mtime):
             print("building generator...")
             os.chdir(f"../{args.contest}/tools")
+            os.system("cargo clean -r")
             os.system("cargo build -r")
             os.chdir("..")
         
