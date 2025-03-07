@@ -85,7 +85,7 @@ def objective_wrapper(args, hyperparameters):
 def run_optuna(args):
     print("optimizing hyperparameters...")
     start = time.time()
-    ray.init(num_cpus=10)
+    ray.init(num_cpus=4)
     # ハイパーパラメータの探索空間定義を取得
     if not os.path.exists(f"../{args.contest}/hyperparameter{args.directory}.yaml"):
         print(f"hyperparameter{args.directory}.yaml does not exists")

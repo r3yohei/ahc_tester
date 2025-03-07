@@ -27,6 +27,7 @@ def main():
     parser.add_argument("-od", "--optuna-direction", help="optimizing direction", type=str, default="maximize")
     parser.add_argument("-ost", "--optuna_score_type", help="optimize with absolute or relative score", type=str, choices=["a", "r"], default="r")
     parser.add_argument("-g", "--gen", help="num of generating testcases", type=int, default=None)
+    parser.add_argument("-l", "--language", help="language of source code", type=str, default="rust")
     args = parser.parse_args()
 
 
@@ -96,7 +97,8 @@ def main():
         os.chdir(f"../{args.contest}/tools")
         if len(args.directory) > 0:
             # 複数問のテストケースへの対応
-            os.system(f"../{generator} ./seeds.txt --problem {args.directory} --dir=in{args.directory}")
+            # os.system(f"../{generator} ./seeds.txt --problem {args.directory} --dir=in{args.directory}") # masters-2024
+            os.system(f"../{generator} ./seeds.txt {args.directory}")
         else:
             os.system(f"../{generator} ./seeds.txt")
         os.chdir("..")

@@ -23,10 +23,14 @@ def parallel_test_func(i, args):
             tester = "../../../target/release/tester"
         else:
             tester = ""
-        if args.platform == "atcoder":
+        if args.platform == "atcoder" and args.language == "rust":
             testee = f"../../../target/release/{args.contest}-{args.binary_suffix}"
-        elif args.platform == "yukicoder":
+        elif args.platform == "yukicoder" and args.language == "rust":
             testee = f"../../../target/release/contest{args.contest}-{args.binary_suffix}"
+        elif args.platform == "atcoder" and args.language == "python":
+            testee = f"python ../{args.contest}/src/bin/{args.binary_suffix}.py"
+        elif args.platform == "yukicoder" and args.language == "python":
+            testee = f"python ../{args.contest}/src/bin/{args.binary_suffix}.py"
         proc = subprocess.Popen(
             f"exec {tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt > ../{args.contest}/tools/out{args.directory}/{i:04}.txt",
             shell=True,
@@ -68,7 +72,7 @@ def parallel_test_func(i, args):
 def parallel_test(args):
     print(f"testing {args.n} cases...")
     start = time.time()
-    ray.init(num_cpus=10)
+    ray.init(num_cpus=5)
     # テスト結果を格納するディレクトリを作る
     os.makedirs(f"../{args.contest}/tools/out{args.directory}", exist_ok=True)
     os.makedirs(f"../{args.contest}/result{args.directory}", exist_ok=True)
@@ -106,10 +110,14 @@ def single_test(i, args):
             tester = "../../../target/release/tester"
         else:
             tester = ""
-        if args.platform == "atcoder":
+        if args.platform == "atcoder" and args.language == "rust":
             testee = f"../../../target/release/{args.contest}-{args.binary_suffix}"
-        elif args.platform == "yukicoder":
+        elif args.platform == "yukicoder" and args.language == "rust":
             testee = f"../../../target/release/contest{args.contest}-{args.binary_suffix}"
+        elif args.platform == "atcoder" and args.language == "python":
+            testee = f"python ../{args.contest}/src/bin/{args.binary_suffix}.py"
+        elif args.platform == "yukicoder" and args.language == "python":
+            testee = f"python ../{args.contest}/src/bin/{args.binary_suffix}.py"
         proc = subprocess.Popen(
             f"{tester} {testee} < ../{args.contest}/tools/in{args.directory}/{i:04}.txt > ../{args.contest}/tools/out{args.directory}/{i:04}.txt",
             shell=True,
