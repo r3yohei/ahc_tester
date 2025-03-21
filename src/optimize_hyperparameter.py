@@ -100,12 +100,27 @@ def run_optuna(args):
         exit(1)
 
     # スコアの最大化か最小化かに注意
-    study = optuna.create_study(
-        study_name=f"{args.contest}{args.directory}",
-        direction=args.optuna_direction,
-        storage=f"sqlite:///{args.contest}{args.directory}.db",
-        load_if_exists=True,
-    )
+    if args.optuna_initial and os.path.exists(f"../{args.contest}/initial_hyperparameter.json"):
+        # 初期値利用
+        with open(f"../{args.contest}/initial_hyperparameter.json", "r") as f:
+            initial = json.load(f)
+        study = optuna.create_study(
+            study_name=f"{args.contest}{args.directory}",
+            direction=args.optuna_direction,
+            storage=f"sqlite:///{args.contest}{args.directory}.db",
+            sampler=optuna.samplers.TPESampler(),
+            pruner=optuna.pruners.MedianPruner(),
+        )
+        study.enqueue_trial(initial)
+    else:
+        study = optuna.create_study(
+            study_name=f"{args.contest}{args.directory}",
+            direction=args.optuna_direction,
+            storage=f"sqlite:///{args.contest}{args.directory}.db",
+            load_if_exists=True,
+            sampler=optuna.samplers.TPESampler(),
+            pruner=optuna.pruners.MedianPruner()
+        )
     study.optimize(objective_wrapper(args, hyperparameter_yaml["hyperparameter"]), n_trials=args.optuna_n_trials)
     
     # 最適化結果の保存

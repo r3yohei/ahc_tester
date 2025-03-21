@@ -26,6 +26,7 @@ def main():
     parser.add_argument("-on", "--optuna-n-trials", help="optuna n_trials", type=int, default=100)
     parser.add_argument("-od", "--optuna-direction", help="optimizing direction", type=str, default="maximize")
     parser.add_argument("-ost", "--optuna_score_type", help="optimize with absolute or relative score", type=str, choices=["a", "r"], default="r")
+    parser.add_argument("-oi", "--optuna-initial", help="initial hyperparameters with json file", action="store_true")
     parser.add_argument("-g", "--gen", help="num of generating testcases", type=int, default=None)
     parser.add_argument("-l", "--language", help="language of source code", type=str, default="rust")
     args = parser.parse_args()
